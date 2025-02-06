@@ -29,14 +29,14 @@ function isPerfect(n) {
 }
 
 function isArmstrong(n) {
-  if (n < 0) return false;
-  const digits = String(n).split("");
+  const absN = Math.abs(n); 
+  const digits = String(absN).split("");
   const power = digits.length;
   const total = digits.reduce(
     (acc, digit) => acc + Math.pow(Number(digit), power),
     0
   );
-  return total === n;
+  return total === absN; 
 }
 
 function digitSum(n) {
