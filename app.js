@@ -45,7 +45,7 @@ function digitSum(n) {
     .reduce((sum, digit) => sum + Number(digit), 0);
 }
 
-app.get("/api/classify-number", async (req, res) => {
+app.get("/classify-number", async (req, res) => {
   const numStr = req.query.number;
   const number = parseInt(numStr, 10);
 
@@ -91,7 +91,9 @@ app.get("/api/classify-number", async (req, res) => {
   });
 });
 
-const port = process.env.PORT || 3000;
-app.listen(port, () => {
-  console.log(`Server listening on port: ${port}`);
-});
+module.exports = app;
+
+// const port = process.env.PORT || 3000;
+// app.listen(port, () => {
+//   console.log(`Server listening on port: ${port}`);
+// });
