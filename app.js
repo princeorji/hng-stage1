@@ -16,7 +16,7 @@ function isPrime(n) {
 
 function isPerfect(n) {
   if (n <= 0) return false;
-  let sum = 1; 
+  let sum = 1;
   for (let i = 2; i <= Math.sqrt(n); i++) {
     if (n % i === 0) {
       sum += i;
@@ -29,14 +29,14 @@ function isPerfect(n) {
 }
 
 function isArmstrong(n) {
-  const absN = Math.abs(n); 
+  const absN = Math.abs(n);
   const digits = String(absN).split("");
   const power = digits.length;
   const total = digits.reduce(
     (acc, digit) => acc + Math.pow(Number(digit), power),
     0
   );
-  return total === absN; 
+  return total === absN;
 }
 
 function digitSum(n) {
@@ -46,51 +46,46 @@ function digitSum(n) {
 }
 
 app.get("/api/classify-number", async (req, res) => {
-  const numStr = req.query.number;
-  const number = parseInt(numStr, 10);
+  const { number } = req.query;
 
-  if (isNaN(number)) {
-    return res.status(400).json({ number: numStr, error: true });
+  // Validate input
+  if (!number || !/^-?\d+$/.test(number)) {
+    console.error("Invalid input:", number);
+    return res.status(400).json({
+      number: number || "",
+      error: true,
+      message: "Invalid number format",
+    });
   }
 
-  const prime = isPrime(number);
-  const perfect = isPerfect(number);
-  const armstrong = isArmstrong(number);
-  const sumDigits = digitSum(number);
+  const num = parseInt(number, 10);
 
-  
   let properties = [];
-  if (armstrong) {
-    properties.push("armstrong", number % 2 === 0 ? "even" : "odd");
-  } else {
-    properties.push(number % 2 === 0 ? "even" : "odd");
-  }
+  if (isArmstrong(num)) properties.push("armstrong");
+  properties.push(num % 2 === 0 ? "even" : "odd");
 
-  let fun_fact = "";
+  let funFact = "Not available";
   try {
-    const response = await fetch(`http://numbersapi.com/${number}/math?json`, {
+    const response = await fetch(`http://numbersapi.com/${num}/math?json`, {
       timeout: 5000,
     });
     if (response.ok) {
       const data = await response.json();
-      fun_fact = data.text || "Fun fact not available.";
-    } else {
-      fun_fact = "Fun fact not available.";
+      funFact = data.text || "Fun fact not available.";
     }
   } catch (error) {
-    fun_fact = "Fun fact not available.";
+    console.error(`Error fetching fun fact for ${num}: ${error.message}`);
   }
 
-  res.json({
-    number,
-    is_prime: prime,
-    is_perfect: perfect,
+  res.status(200).json({
+    number: num,
+    is_prime: isPrime(num),
+    is_perfect: isPerfect(num),
     properties,
-    digit_sum: sumDigits,
-    fun_fact,
+    digit_sum: digitSum(num),
+    fun_fact: funFact,
   });
 });
-
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
